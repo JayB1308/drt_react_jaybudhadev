@@ -18,7 +18,7 @@ export default function DataTable<T>({
   data,
   columns,
   loading,
-  height = 600,
+  height = 550,
 }: DataTableProps<T>) {
   const tableContainerRef = useRef<HTMLDivElement>(null);
 

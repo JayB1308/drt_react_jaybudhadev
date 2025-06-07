@@ -6,12 +6,13 @@ export default function Columns() {
 
   return [
     columnHelper.accessor("noradCatId", {
+      id: "noradCatId",
       header: "NORAD ID",
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor("intlDes", {
       header: "Intl Designator",
-      cell: (info) => info.getValue(),
+      cell: (info) => info.getValue() ?? "-",
     }),
     columnHelper.accessor("name", {
       header: "Object Name",

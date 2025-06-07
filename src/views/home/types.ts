@@ -1,3 +1,5 @@
+import type { SelectValue } from "@components/select";
+
 export type SatelliteObject = {
   noradCatId: string;
   intlDes: string;
@@ -8,4 +10,10 @@ export type SatelliteObject = {
   launchSiteCode?: string;
   countryCode?: string;
   orbitCode?: string;
+};
+
+export type FilterData = {
+  objectTypes: SelectValue[];
+  attributes: SelectValue[];
+  [key: string]: SelectValue[];
 };
