@@ -25,7 +25,9 @@
     "baseUrl": "./src",
     "paths": {
       "@components/*": ["components/*"],
-      "@views/*": ["views/*"]
+      "@views/*": ["views/*"],
+      "@configs/*": ["utility/configs/*"],
+      "@hooks/*": ["utility/hooks/*"]
     }
   },
   "include": ["src"]
