@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { useAxios } from "@hooks/use-axios";
 import type { FilterData, SatelliteObject } from "./types";
 import type { SelectValue } from "@components/select";
@@ -7,14 +6,13 @@ import type { SelectValue } from "@components/select";
 export default function useSatelliteData() {
   const [satData, setSatData] = useState<SatelliteObject[]>([]);
   const [filterData, setFilterData] = useState<Partial<FilterData>>({});
-
   const { loading, get } = useAxios();
 
   const getSatelliteData = async () => {
-    const params = Object.keys(filterData).reduce((acc, key) => {
-      const values = filterData[key];
+    const params = Object.entries(filterData).reduce((acc, [key, values]) => {
+      if (key === "orbitCodes") return acc;
       if (Array.isArray(values) && values.length > 0) {
-        acc[key] = values.map((item: SelectValue) => item.value).join(",");
+        acc[key] = values.map((v: SelectValue) => v.value).join(",");
       }
       return acc;
     }, {} as Record<string, string>);
@@ -23,8 +21,15 @@ export default function useSatelliteData() {
       url: "/satellites",
       params,
     });
+    let results = Array.isArray(data) ? data : [];
 
-    setSatData(data);
+    const orbitSelections = filterData.orbitCodes?.map((o) => o.value) || [];
+    if (orbitSelections.length) {
+      const allowSet = new Set(orbitSelections);
+      results = results.filter((sat) => allowSet.has(sat.orbitCode));
+    }
+
+    setSatData(results);
   };
 
   const applyFilters = async () => {
@@ -42,11 +47,13 @@ export default function useSatelliteData() {
     getSatelliteData();
   }, []);
 
+  console.log(satData);
+
   return {
     loading,
     satData,
-    handleDropdown,
     filterData,
+    handleDropdown,
     applyFilters,
   };
 }

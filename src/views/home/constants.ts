@@ -16,3 +16,11 @@ export const ATTR_OPTIONS = [
   { label: "Country Code", value: "countryCode" },
   { label: "Orbit Code", value: "orbitCode" },
 ];
+
+export const ORBIT_CODE_OPTIONS = [
+  { label: "LEO", value: "{LEO}" },
+  { label: "LEO2", value: "{LEO2}" },
+  { label: "MEO", value: "{MEO}" },
+  { label: "GEO", value: "{GEO}" },
+  { label: "HEO", value: "{HEO}" },
+];

@@ -4,7 +4,11 @@ import useSatelliteData from "./use-satellite";
 import Columns from "./columns";
 import type { SatelliteObject } from "./types";
 import Dropdown, { type SelectValue } from "@components/select";
-import { ATTR_OPTIONS, OBJECT_TYPE_OPTIONS } from "./constants";
+import {
+  ATTR_OPTIONS,
+  OBJECT_TYPE_OPTIONS,
+  ORBIT_CODE_OPTIONS,
+} from "./constants";
 
 export default function Home() {
   const { loading, satData, handleDropdown, filterData, applyFilters } =
@@ -28,6 +32,14 @@ export default function Home() {
         value={filterData.attributes as SelectValue[]}
         onChange={(value) =>
           handleDropdown("attributes", value as SelectValue[])
+        }
+      />
+      <Dropdown
+        options={ORBIT_CODE_OPTIONS}
+        isMulti
+        value={filterData.orbitCodes as SelectValue[]}
+        onChange={(value) =>
+          handleDropdown("orbitCodes", value as SelectValue[])
         }
       />
       <button

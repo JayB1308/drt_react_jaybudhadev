@@ -1,11 +1,13 @@
+import { useRef, useState } from "react";
 import {
   useReactTable,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   type ColumnDef,
+  type SortingState,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useRef } from "react";
 
 interface DataTableProps<T> {
   data: T[];
@@ -20,12 +22,18 @@ export default function DataTable<T>({
   loading,
   height = 550,
 }: DataTableProps<T>) {
+  const [sortingState, setSortingState] = useState<SortingState>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting: sortingState,
+    },
+    onSortingChange: setSortingState,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   const { rows } = table.getRowModel();
@@ -55,18 +63,23 @@ export default function DataTable<T>({
           style={{ height }}
         >
           <table className="grid min-w-full">
-            <thead className="sticky top-0 z-10 grid bg-gray-50 border-b">
+            <thead className="sticky top-0 grid bg-gray-50 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id} className="flex w-full">
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
                       className="flex-1 p-2 text-left text-sm font-medium text-gray-700"
                     >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
+                      {{
+                        asc: " 🔼",
+                        desc: " 🔽",
+                      }[header.column.getIsSorted() as string] ?? null}
                     </th>
                   ))}
                 </tr>

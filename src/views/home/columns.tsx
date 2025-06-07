@@ -9,6 +9,7 @@ export default function Columns() {
       id: "noradCatId",
       header: "NORAD ID",
       cell: (info) => info.getValue(),
+      enableSorting: true,
     }),
     columnHelper.accessor("intlDes", {
       header: "Intl Designator",
