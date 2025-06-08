@@ -1,56 +1,35 @@
 import DataTable from "@components/datatable";
-import { useState } from "react";
-
 import useSatelliteData from "./use-satellite";
-import useColumns from "./columns";
 import type { SatelliteObject } from "./types";
 import Dropdown, { type SelectValue } from "@components/select";
 import Search from "@components/search";
+import { useNavigate } from "react-router";
 import {
   ATTR_OPTIONS,
   OBJECT_TYPE_OPTIONS,
   ORBIT_CODE_OPTIONS,
 } from "./constants";
 
-const MAX_SELECTION = 10;
-
 export default function Home() {
+  const navigate = useNavigate();
   const {
     loading,
     satData,
-    handleDropdown,
+    columns,
     filterData,
-    applyFilters,
+    selectedAttributes,
+    selectedSatellites,
+    selectionError,
+    maxSelection,
+    handleDropdown,
     handleSearch,
+    handleAttributesChange,
+    handleApplyFilters,
+    handleRowSelect,
   } = useSatelliteData();
 
-  const [selectedAttributes, setSelectedAttributes] = useState<SelectValue[]>(
-    filterData.attributes || []
-  );
-  const [selectedSatellites, setSelectedSatellites] = useState<SatelliteObject[]>([]);
-  const [selectionError, setSelectionError] = useState<string>("");
-  const cols = useColumns(selectedAttributes);
-
-  const handleAttributesChange = (
-    value: SelectValue | SelectValue[] | null
-  ) => {
-    handleDropdown("attributes", (value as SelectValue[]) || []);
-  };
-
-  const handleApplyFilters = async () => {
-    await applyFilters();
-    setSelectedAttributes(filterData.attributes || []);
-  };
-
-  const handleRowSelect = (selected: SatelliteObject[]) => {
-    if (selected.length > MAX_SELECTION) {
-      setSelectionError(`You can only select up to ${MAX_SELECTION} satellites at a time`);
-      setSelectedSatellites(selected.slice(0, MAX_SELECTION));
-      setTimeout(() => setSelectionError(""), 3000);
-      return;
-    }
-    setSelectionError("");
-    setSelectedSatellites(selected);
+  const handleProceed = () => {
+    navigate("/selected-items");
   };
 
   return (
@@ -64,11 +43,17 @@ export default function Home() {
         </div>
       )}
       {selectedSatellites.length > 0 && (
-        <div className="px-4 py-2 bg-blue-50 border-b">
+        <div className="px-4 py-2 bg-blue-50 border-b flex justify-between items-center">
           <p className="text-sm text-blue-700">
             {selectedSatellites.length} satellite{selectedSatellites.length !== 1 ? 's' : ''} selected
-            {selectedSatellites.length === MAX_SELECTION && ` (Maximum limit reached)`}
+            {selectedSatellites.length === maxSelection && ` (Maximum limit reached)`}
           </p>
+          <button
+            onClick={handleProceed}
+            className="bg-green-500 text-white px-4 py-1.5 rounded-md hover:bg-green-600 transition-colors text-sm"
+          >
+            Proceed to Selected Items
+          </button>
         </div>
       )}
       <div className="p-4 space-y-4">
@@ -110,7 +95,7 @@ export default function Home() {
           <Dropdown
             options={ATTR_OPTIONS}
             isMulti
-            value={filterData.attributes as SelectValue[]}
+            value={selectedAttributes}
             onChange={handleAttributesChange}
           />
         </div>
@@ -118,11 +103,11 @@ export default function Home() {
       <div className="p-4 max-h-[90%]">
         <DataTable<SatelliteObject>
           data={satData}
-          columns={cols}
+          columns={columns}
           loading={loading}
           selectedRows={selectedSatellites}
           onRowSelect={handleRowSelect}
-          maxSelection={MAX_SELECTION}
+          maxSelection={maxSelection}
         />
       </div>
     </div>
