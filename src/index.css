@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+@theme {
+  --color-navy: oklch(0.25 0.08 240); 
+  --color-starlight-50: oklch(0.98 0.02 200); 
+  --color-starlight-100: oklch(0.95 0.05 200);
+
+  --font-sans: "Exo 2", sans-serif;
+  --font-mono: "Exo 2", sans-serif;
+  --font-display: "Exo 2", sans-serif;
+
+  --spacing-0: 0rem;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem; 
+  --spacing-4: 1rem; 
+  --spacing-5: 1.5rem;
+  --spacing-6: 2rem; 
+  --spacing-7: 3rem; 
+  --spacing-8: 4rem;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 2rem;
+  --text-2xl: 2rem;
+  --text-2xl--line-height: 2.5rem;
+  --text-3xl: 3rem;
+  --text-3xl--line-height: 3.5rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+
+  --breakpoint-sm: 40rem; /* 640px */
+  --breakpoint-md: 48rem; /* 768px */
+  --breakpoint-lg: 64rem; /* 1024px */
+
+  --shadow-glow: 0 0 8px oklch(0.98 0.02 200 / 0.5); /* Soft starlight glow */
+  --shadow-glow-intense: 0 0 12px oklch(0.98 0.02 200 / 0.8); /* Brighter glow for hover */
+}
+
+@utility glow {
+  box-shadow: var(--shadow-glow);
+}
+
+@utility glow-intense {
+  box-shadow: var(--shadow-glow-intense);
+}
+
+
+@layer components {
+  .card {
+    @apply bg-navy text-starlight-50 p-5 rounded-md glow;
+  }
+  .btn {
+    @apply bg-navy text-starlight-50 font-display font-semibold px-4 py-2 rounded-md glow hover:glow-intense transition;
+  }
+  .heading {
+    @apply text-3xl font-display text-starlight-50 font-bold tracking-tight;
+  }
+}

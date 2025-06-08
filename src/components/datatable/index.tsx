@@ -148,69 +148,85 @@ export default function DataTable<T>({
       {loading ? (
         <p className="p-4 text-center">Loading...</p>
       ) : (
-        <div
-          ref={tableContainerRef}
-          className="relative overflow-auto border rounded-md"
-          style={{ height }}
-        >
-          <table className="grid min-w-full">
-            <thead className="sticky top-0 grid bg-white border-b">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="flex w-full bg-white">
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className="flex-1 p-2 text-left text-sm font-medium text-gray-700"
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {{
-                        asc: " 🔼",
-                        desc: " 🔽",
-                      }[header.column.getIsSorted() as string] ?? null}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-
-            <tbody
-              className="grid relative"
-              style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-              }}
-            >
-              {virtualRows.map((virtualRow) => {
-                const row = rows[virtualRow.index];
-                return (
-                  <tr
-                    key={row.id}
-                    data-index={virtualRow.index}
-                    ref={(el) => rowVirtualizer.measureElement(el)}
-                    className={`flex w-full absolute hover:bg-gray-50 ${
-                      row.getIsSelected() ? 'bg-blue-50' : ''
-                    }`}
-                    style={{
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="flex-1 p-2 text-sm border-b">
+        <>
+          <div className="flex justify-between items-center mb-3 px-3 py-2 bg-gray-50 rounded-md border border-gray-200">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-500">Total Rows:</span>
+              <span className="text-sm font-semibold text-navy bg-white px-2 py-0.5 rounded border border-gray-200">
+                {data.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-500">Selected Rows:</span>
+              <span className="text-sm font-semibold text-navy bg-white px-2 py-0.5 rounded border border-gray-200">
+                {selectedRows.length}
+              </span>
+            </div>
+          </div>
+          <div
+            ref={tableContainerRef}
+            className="relative overflow-auto border rounded-md"
+            style={{ height }}
+          >
+            <table className="grid min-w-full">
+              <thead className="sticky top-0 z-[1] grid bg-white border-b border-navy">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id} className="flex w-full bg-white">
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="flex-1 p-2 text-left text-sm font-medium text-gray-700"
+                      >
                         {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
+                          header.column.columnDef.header,
+                          header.getContext()
                         )}
-                      </td>
+                        {{
+                          asc: " 🔼",
+                          desc: " 🔽",
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </th>
                     ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </thead>
+
+              <tbody
+                className="grid relative"
+                style={{
+                  height: `${rowVirtualizer.getTotalSize()}px`,
+                }}
+              >
+                {virtualRows.map((virtualRow) => {
+                  const row = rows[virtualRow.index];
+                  return (
+                    <tr
+                      key={row.id}
+                      data-index={virtualRow.index}
+                      ref={(el) => rowVirtualizer.measureElement(el)}
+                      className={`flex w-full absolute hover:bg-gray-50 hover:text-navy transition-colors ${
+                        row.getIsSelected() ? 'bg-blue-50 text-navy' : ''
+                      }`}
+                      style={{
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="flex-1 p-2 text-sm border-b group-hover:text-navy">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

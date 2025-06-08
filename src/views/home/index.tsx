@@ -20,6 +20,7 @@ export default function Home() {
     selectedAttributes,
     selectedSatellites,
     selectionError,
+    fetchError,
     maxSelection,
     handleDropdown,
     handleSearch,
@@ -33,35 +34,41 @@ export default function Home() {
   };
 
   return (
-    <div className="h-[100vh] overflow-hidden px-4">
-      <h1 className="text-2xl font-bold mb-4 ml-4 mt-4">
-        Create My Asset List
-      </h1>
+    <div className="h-[100vh] overflow-hidden px-4 bg-navy text-white">
+      <div className="flex justify-between items-center mb-4 border-b-2 mt-2 py-4">
+        <h1 className="text-2xl font-bold pb-3">
+          Create My Asset List
+        </h1>
+        <div className="flex items-center gap-4">
+          {selectedSatellites.length > 0 && (
+            <button
+              onClick={handleProceed}
+              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors text-sm whitespace-nowrap"
+            >
+              Proceed to Selected Items
+            </button>
+          )}
+          <div className="w-80">
+            <Search onSearch={handleSearch} loading={loading} />
+          </div>
+        </div>
+      </div>
       {selectionError && (
         <div className="px-4 py-2 bg-red-50 border-b border-red-200">
           <p className="text-sm text-red-700">{selectionError}</p>
         </div>
       )}
-      {selectedSatellites.length > 0 && (
-        <div className="px-4 py-2 bg-blue-50 border-b flex justify-between items-center">
-          <p className="text-sm text-blue-700">
-            {selectedSatellites.length} satellite{selectedSatellites.length !== 1 ? 's' : ''} selected
-            {selectedSatellites.length === maxSelection && ` (Maximum limit reached)`}
-          </p>
-          <button
-            onClick={handleProceed}
-            className="bg-green-500 text-white px-4 py-1.5 rounded-md hover:bg-green-600 transition-colors text-sm"
-          >
-            Proceed to Selected Items
-          </button>
+      {fetchError && (
+        <div className="px-4 py-2 bg-red-50 border-b border-red-200">
+          <p className="text-sm text-red-700">{fetchError}</p>
         </div>
       )}
       <div className="p-4 space-y-4">
         <div className="flex gap-4">
           <div className="flex-1">
-            <Search onSearch={handleSearch} loading={loading} />
-          </div>
-          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Object Type
+            </label>
             <Dropdown
               options={OBJECT_TYPE_OPTIONS}
               isMulti
@@ -72,6 +79,9 @@ export default function Home() {
             />
           </div>
           <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Orbit Code
+            </label>
             <Dropdown
               options={ORBIT_CODE_OPTIONS}
               isMulti
@@ -92,6 +102,9 @@ export default function Home() {
           </div>
         </div>
         <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-300 mb-1">
+            Table Columns
+          </label>
           <Dropdown
             options={ATTR_OPTIONS}
             isMulti

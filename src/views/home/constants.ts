@@ -36,5 +36,5 @@ export const ORBIT_CODE_OPTIONS = [
   { label: "LMO", value: "{LMO}" },
   { label: "UFO", value: "{UFO}" },
   { label: "ESO", value: "{ESO}" },
-  { label: "UNKNOWN", value: "{UNKNOWN}" },
+  { label: "UNKNOWN", value: "UNKNOWN" },
 ];

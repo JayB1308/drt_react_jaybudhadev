@@ -20,9 +20,9 @@ export default function SelectedItems() {
   };
 
   return (
-    <div className="h-[100vh] overflow-hidden px-4">
-      <div className="flex items-center justify-between py-4">
-        <h1 className="text-2xl font-bold">Selected Satellites</h1>
+    <div className="h-[100vh] overflow-hidden px-4 bg-navy text-white">
+      <div className="flex items-center justify-between mb-4 border-b-2 mt-2 py-4">
+        <h1 className="text-2xl font-bold pb-3">Selected Satellites</h1>
         <button
           onClick={handleBack}
           className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
@@ -39,10 +39,14 @@ export default function SelectedItems() {
             {selectedSatellites.map((sat) => (
               <div
                 key={sat.noradCatId}
-                className="bg-white p-4 rounded-lg shadow border"
+                className="bg-white/10 p-4 rounded-lg border border-white/20 hover:bg-white/20 transition-colors hover:glow-intense focus-within:bg-white/20"
+                tabIndex={0}
               >
-                <h3 className="font-medium text-lg">{sat.name}</h3>
-                <p className="text-gray-600">NORAD ID: {sat.noradCatId}</p>
+                <h3 className="font-medium text-lg text-white mb-2">{sat.name}</h3>
+                <div className="text-gray-300">
+                  <span className="text-sm font-medium text-gray-400">NORAD ID:</span>
+                  <span className="ml-2">{sat.noradCatId}</span>
+                </div>
               </div>
             ))}
           </div>
