@@ -63,9 +63,9 @@ export default function DataTable<T>({
           style={{ height }}
         >
           <table className="grid min-w-full">
-            <thead className="sticky top-0 grid bg-gray-50 border-b">
+            <thead className="sticky top-0 grid bg-white border-b">
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="flex w-full">
+                <tr key={headerGroup.id} className="flex w-full bg-white">
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}

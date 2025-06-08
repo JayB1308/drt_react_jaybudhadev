@@ -1,11 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAxios } from "@hooks/use-axios";
 import type { FilterData, SatelliteObject } from "./types";
 import type { SelectValue } from "@components/select";
+import { ATTR_OPTIONS } from "./constants";
+
+const DEFAULT_ATTRIBUTES = [
+  "name",
+  "noradCatId",
+  "orbitCode",
+  "objectType",
+  "countryCode",
+  "launchDate",
+].map(attr => ATTR_OPTIONS.find(opt => opt.value === attr)!);
 
 export default function useSatelliteData() {
   const [satData, setSatData] = useState<SatelliteObject[]>([]);
-  const [filterData, setFilterData] = useState<Partial<FilterData>>({});
+  const [filterData, setFilterData] = useState<Partial<FilterData>>({
+    attributes: DEFAULT_ATTRIBUTES,
+  });
+  const [searchTerm, setSearchTerm] = useState("");
   const { loading, get } = useAxios();
 
   const getSatelliteData = async () => {
@@ -16,6 +29,10 @@ export default function useSatelliteData() {
       }
       return acc;
     }, {} as Record<string, string>);
+
+    params.attributes = (filterData.attributes?.length 
+      ? filterData.attributes 
+      : DEFAULT_ATTRIBUTES).map(v => v.value).join(",");
 
     const { data } = await get({
       url: "/satellites",
@@ -32,7 +49,23 @@ export default function useSatelliteData() {
     setSatData(results);
   };
 
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return satData;
+
+    const searchLower = searchTerm.toLowerCase();
+    return satData.filter(sat => 
+      sat.name.toLowerCase().includes(searchLower) ||
+      sat.noradCatId.toLowerCase().includes(searchLower)
+    );
+  }, [satData, searchTerm]);
+
   const applyFilters = async () => {
+    if (!filterData.attributes?.length) {
+      setFilterData(prev => ({
+        ...prev,
+        attributes: DEFAULT_ATTRIBUTES,
+      }));
+    }
     await getSatelliteData();
   };
 
@@ -43,17 +76,20 @@ export default function useSatelliteData() {
     }));
   };
 
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+
   useEffect(() => {
     getSatelliteData();
   }, []);
 
-  console.log(satData);
-
   return {
     loading,
-    satData,
+    satData: filteredData,
     filterData,
     handleDropdown,
     applyFilters,
+    handleSearch,
   };
 }
