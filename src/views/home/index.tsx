@@ -103,7 +103,7 @@ export default function Home() {
         </div>
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-300 mb-1">
-            Table Columns
+            Attributes
           </label>
           <Dropdown
             options={ATTR_OPTIONS}
