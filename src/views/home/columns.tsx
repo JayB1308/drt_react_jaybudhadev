@@ -5,7 +5,7 @@ import type { SelectValue } from "@components/select";
 type ColumnDefinition = {
   id: string;
   header: string;
-  accessor: (row: SatelliteObject) => string | undefined;
+  accessor: (row: SatelliteObject) => unknown;
   enableSorting?: boolean;
 };
 

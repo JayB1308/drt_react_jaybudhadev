@@ -12,6 +12,8 @@ import {
   ORBIT_CODE_OPTIONS,
 } from "./constants";
 
+const MAX_SELECTION = 10;
+
 export default function Home() {
   const {
     loading,
@@ -25,6 +27,8 @@ export default function Home() {
   const [selectedAttributes, setSelectedAttributes] = useState<SelectValue[]>(
     filterData.attributes || []
   );
+  const [selectedSatellites, setSelectedSatellites] = useState<SatelliteObject[]>([]);
+  const [selectionError, setSelectionError] = useState<string>("");
   const cols = useColumns(selectedAttributes);
 
   const handleAttributesChange = (
@@ -38,11 +42,35 @@ export default function Home() {
     setSelectedAttributes(filterData.attributes || []);
   };
 
+  const handleRowSelect = (selected: SatelliteObject[]) => {
+    if (selected.length > MAX_SELECTION) {
+      setSelectionError(`You can only select up to ${MAX_SELECTION} satellites at a time`);
+      setSelectedSatellites(selected.slice(0, MAX_SELECTION));
+      setTimeout(() => setSelectionError(""), 3000);
+      return;
+    }
+    setSelectionError("");
+    setSelectedSatellites(selected);
+  };
+
   return (
     <div className="h-[100vh] overflow-hidden px-4">
       <h1 className="text-2xl font-bold mb-4 ml-4 mt-4">
         Create My Asset List
       </h1>
+      {selectionError && (
+        <div className="px-4 py-2 bg-red-50 border-b border-red-200">
+          <p className="text-sm text-red-700">{selectionError}</p>
+        </div>
+      )}
+      {selectedSatellites.length > 0 && (
+        <div className="px-4 py-2 bg-blue-50 border-b">
+          <p className="text-sm text-blue-700">
+            {selectedSatellites.length} satellite{selectedSatellites.length !== 1 ? 's' : ''} selected
+            {selectedSatellites.length === MAX_SELECTION && ` (Maximum limit reached)`}
+          </p>
+        </div>
+      )}
       <div className="p-4 space-y-4">
         <div className="flex gap-4">
           <div className="flex-1">
@@ -92,6 +120,9 @@ export default function Home() {
           data={satData}
           columns={cols}
           loading={loading}
+          selectedRows={selectedSatellites}
+          onRowSelect={handleRowSelect}
+          maxSelection={MAX_SELECTION}
         />
       </div>
     </div>

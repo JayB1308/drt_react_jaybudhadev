@@ -11,9 +11,12 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 interface DataTableProps<T> {
   data: T[];
-  columns: ColumnDef<T, any>[];
+  columns: ColumnDef<T, unknown>[];
   loading?: boolean;
   height?: number;
+  selectedRows?: T[];
+  onRowSelect?: (selectedRows: T[]) => void;
+  maxSelection?: number;
 }
 
 export default function DataTable<T>({
@@ -21,19 +24,107 @@ export default function DataTable<T>({
   columns,
   loading,
   height = 550,
+  selectedRows = [],
+  onRowSelect,
+  maxSelection,
 }: DataTableProps<T>) {
   const [sortingState, setSortingState] = useState<SortingState>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
+  const selectionColumn: ColumnDef<T, unknown> = {
+    id: "select",
+    header: ({ table }) => {
+      const isAllSelected = table.getIsAllRowsSelected();
+      const isSomeSelected = table.getIsSomeRowsSelected();
+      const isMaxReached = maxSelection !== undefined && selectedRows.length >= maxSelection;
+
+      return (
+        <div className="flex items-center gap-1.5">
+          <input
+            type="checkbox"
+            checked={isAllSelected}
+            ref={(input) => {
+              if (input) {
+                input.indeterminate = isSomeSelected;
+              }
+            }}
+            onChange={(e) => {
+              if (maxSelection !== undefined) {
+                if (e.target.checked) {
+                  const rowsToSelect = data.slice(0, maxSelection);
+                  const newSelection = rowsToSelect.reduce((acc, _, index) => {
+                    acc[index] = true;
+                    return acc;
+                  }, {} as Record<number, boolean>);
+                  table.setRowSelection(newSelection);
+                } else {
+                  table.toggleAllRowsSelected(false);
+                }
+              } else {
+                table.toggleAllRowsSelected(e.target.checked);
+              }
+            }}
+            disabled={isMaxReached && !isAllSelected}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <span className="text-sm text-gray-600">Select All</span>
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      const isMaxReached = maxSelection !== undefined && selectedRows.length >= maxSelection;
+      const isSelected = row.getIsSelected();
+
+      return (
+        <div className="flex justify-start">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(e) => {
+              if (isMaxReached && !isSelected) {
+                return;
+              }
+              row.toggleSelected(e.target.checked);
+            }}
+            disabled={isMaxReached && !isSelected}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+        </div>
+      );
+    },
+    size: 16,
+  };
+
   const table = useReactTable({
     data,
-    columns,
+    columns: [selectionColumn, ...columns],
     state: {
       sorting: sortingState,
+      rowSelection: selectedRows.reduce((acc, row) => {
+        const index = data.findIndex((item) => item === row);
+        if (index !== -1) {
+          acc[index] = true;
+        }
+        return acc;
+      }, {} as Record<number, boolean>),
     },
     onSortingChange: setSortingState,
+    onRowSelectionChange: (updater) => {
+      if (onRowSelect) {
+        const newSelection = typeof updater === 'function' 
+          ? updater(table.getState().rowSelection)
+          : updater;
+        
+        const selectedItems = Object.keys(newSelection)
+          .map(Number)
+          .map(index => data[index]);
+        
+        onRowSelect(selectedItems);
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    enableRowSelection: true,
   });
 
   const { rows } = table.getRowModel();
@@ -99,7 +190,9 @@ export default function DataTable<T>({
                     key={row.id}
                     data-index={virtualRow.index}
                     ref={(el) => rowVirtualizer.measureElement(el)}
-                    className="flex w-full absolute hover:bg-gray-50"
+                    className={`flex w-full absolute hover:bg-gray-50 ${
+                      row.getIsSelected() ? 'bg-blue-50' : ''
+                    }`}
                     style={{
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
